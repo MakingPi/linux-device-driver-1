@@ -26,7 +26,7 @@ struct class *class_pcd;
 struct device *device_pcd;
 
 
-loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
+static loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
 {
 	loff_t temp;
 
@@ -62,7 +62,7 @@ loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
 
 }
 
-ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_pos)
+static ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_pos)
 {
 	pr_info("Read requested for %zu bytes \n",count);
 	pr_info("Current file position = %lld\n",*f_pos);
@@ -87,7 +87,7 @@ ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_p
 	return count;
 }
 
-ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff_t *f_pos)
+static ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff_t *f_pos)
 {
 	pr_info("Write requested for %zu bytes\n",count);
 	pr_info("Current file position = %lld\n",*f_pos);
@@ -117,14 +117,14 @@ ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff
 	return count;
 }
 
-int pcd_open(struct inode *inode, struct file *filp)
+static int pcd_open(struct inode *inode, struct file *filp)
 {
 	pr_info("open was successful\n");
 
 	return 0;
 }
 
-int pcd_release(struct inode *inode, struct file *flip)
+static int pcd_release(struct inode *inode, struct file *flip)
 {
 	pr_info("release was successful\n");
 
@@ -139,6 +139,7 @@ struct file_operations pcd_fops=
 	.release = pcd_release,
 	.read = pcd_read,
 	.write = pcd_write,
+	.llseek = pcd_lseek,
 	.owner = THIS_MODULE
 };
 
@@ -168,7 +169,7 @@ static int __init pcd_driver_init(void)
 	}
 
 	/*4. create device class under /sys/class/ */
-	class_pcd = class_create(THIS_MODULE,"pcd_class");
+	class_pcd = class_create("pcd_class");
 	if(IS_ERR(class_pcd)){
 		pr_err("Class creation failed\n");
 		ret = PTR_ERR(class_pcd);
