@@ -92,7 +92,7 @@ struct pcdrv_private_data pcdrv_data =
 
 
 
-loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
+static loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
 {
 
 	struct pcdev_private_data *pcdev_data = (struct pcdev_private_data*)filp->private_data;
@@ -132,7 +132,7 @@ loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
 	return filp->f_pos;
 }
 
-ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_pos)
+static ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_pos)
 {
 	
 	struct pcdev_private_data *pcdev_data = (struct pcdev_private_data*)filp->private_data;
@@ -163,7 +163,7 @@ ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_p
 
 }
 
-ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff_t *f_pos)
+static ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff_t *f_pos)
 {
 	struct pcdev_private_data *pcdev_data = (struct pcdev_private_data*)filp->private_data;
 
@@ -198,7 +198,7 @@ ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff
 }
 
 
-int check_permission(int dev_perm, int acc_mode)
+static int check_permission(int dev_perm, int acc_mode)
 {
 
 	if(dev_perm == RDWR)
@@ -217,7 +217,7 @@ int check_permission(int dev_perm, int acc_mode)
 }
 
 
-int pcd_open(struct inode *inode, struct file *filp)
+static int pcd_open(struct inode *inode, struct file *filp)
 {
 	int ret;
 
@@ -244,7 +244,7 @@ int pcd_open(struct inode *inode, struct file *filp)
 	return ret;
 }
 
-int pcd_release(struct inode *inode, struct file *flip)
+static int pcd_release(struct inode *inode, struct file *flip)
 {
 	pr_info("release was successful\n");
 
@@ -277,7 +277,7 @@ static int __init pcd_driver_init(void)
 	}
 
 	/*create device class under /sys/class/ */
-	pcdrv_data.class_pcd = class_create(THIS_MODULE,"pcd_class");
+	pcdrv_data.class_pcd = class_create("pcd_class");
 	if(IS_ERR(pcdrv_data.class_pcd)){
 		pr_err("Class creation failed\n");
 		ret = PTR_ERR(pcdrv_data.class_pcd);

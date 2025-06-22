@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
 	
 	int n =0,ret=0;
 
-	if(argc != 2 ){
+	printf("argc = %d\n", argc);
+	if(argc != 3 ){
 		printf("Wrong usage\n");
 		printf("Correct usage: <file> <readcount>\n");
 		return 0;
@@ -30,12 +31,12 @@ int main(int argc, char *argv[])
 
 
 	/*convert command line supplied data to integer */
-	remaining = atoi(argv[1]);
+	remaining = atoi(argv[2]);
 
 	printf("read requested = %d\n",remaining);
 
 
-	fd = open("/dev/pcdev-0",O_RDONLY);
+	fd = open(argv[1],O_RDONLY);
 
 	if(fd < 0){
 		/*perror decodes user space errno variable and prints cause of failure*/

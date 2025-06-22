@@ -118,3 +118,43 @@ rmmod drivers/pcd.ko
 
 # should be able to read/write to the char device and see all the output.
 
+# PCD_n driver, needs same changes to compile cleanly and same update to makefile.
+# on host, from /custom_drivers/003pseudo_char_driver/
+make
+scp pcd_n.ko debian@192.168.7.2:/home/debian/drivers/
+# on target
+# if not already in sudo mode
+sudo -s
+insmod drivers/pcd_n.ko
+ls -l /dev/pcdev-*
+# notice the perms in fs are still showing as rw ??! hmm...
+echo "test write" > /dev/pcdev-1
+# however this does fail the open as intended.
+# i needed to install strace on the target.
+apt install strace
+# this is testing on the target, so use a different input file that exists
+# write to dev 1
+strace dd if=/etc/sysctl.conf of=/dev/pcdev-1
+
+# write to dev 2
+dd if=/etc/sysctl.conf of=/dev/pcdev-2
+dd if=/etc/sysctl.conf of=/dev/pcdev-2 count=1
+# read from dev 2
+dd if=/dev/pcdev-2 of=file.txt
+
+# write to dev 3
+dd if=/etc/sysctl.conf of=/dev/pcdev-3 count=1 bs=100
+cat /dev/pcdev-3
+
+# compile dev_read.c for target and scp to target
+# on host, from /custom_drivers/003pseudo_char_driver/ 
+arm-linux-gnueabihf-gcc dev_read.c -o dev_read
+file dev_read
+scp dev_read debian@192.168.7.2:/home/debian/
+
+# back to target
+file dev_read
+cat /etc/sysctl.conf > /dev/pcdev-3
+./dev_read /dev/pcdev-3 10
+./dev_read /dev/pcdev-3 10000
+
