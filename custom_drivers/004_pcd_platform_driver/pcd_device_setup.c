@@ -6,7 +6,7 @@
 #undef pr_fmt
 #define pr_fmt(fmt) "%s : " fmt,__func__
 
-void pcdev_release(struct device *dev)
+static void pcdev_release(struct device *dev)
 {
 	pr_info("Device released \n");
 }

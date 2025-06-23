@@ -158,3 +158,24 @@ cat /etc/sysctl.conf > /dev/pcdev-3
 ./dev_read /dev/pcdev-3 10
 ./dev_read /dev/pcdev-3 10000
 
+
+# Section 6. Platform drivers
+# Fixed the typical kernel 5 -> 6 issues, and found a function signature mismatch that was updated to return void() on destroy.
+# on the host, from the 004_pcd_platform_driver/ folder
+make host
+sudo -s
+dmesg -C
+insmod pcd_device_setup.ko
+dmesg
+ls -l /sys/devices/platform/
+rmmod pcd_device_setup
+dmesg
+insmod pcd_platform_driver.ko
+dmesg
+insmod pcd_device_setup.ko
+dmesg
+# should see all the probe calls and pulling in the specific device versions and their configuration parameters.
+rmmod pcd_device_setup
+rmmod pcd_platform_driver
+
+
