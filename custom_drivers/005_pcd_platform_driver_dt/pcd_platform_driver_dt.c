@@ -61,7 +61,7 @@ struct pcdrv_private_data
 /*Driver's private data */
 struct pcdrv_private_data pcdrv_data;
 
-int check_permission(int dev_perm, int acc_mode)
+static int check_permission(int dev_perm, int acc_mode)
 {
 
 	if(dev_perm == RDWR)
@@ -80,7 +80,7 @@ int check_permission(int dev_perm, int acc_mode)
 }
 
 
-loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
+static loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
 {
 
 	struct pcdev_private_data *pcdev_data = (struct pcdev_private_data*)filp->private_data;
@@ -120,7 +120,7 @@ loff_t pcd_lseek(struct file *filp, loff_t offset, int whence)
 	return filp->f_pos;
 }
 
-ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_pos)
+static ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_pos)
 {
 	struct pcdev_private_data *pcdev_data = (struct pcdev_private_data*)filp->private_data;
 
@@ -150,7 +150,7 @@ ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_p
 
 }
 
-ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff_t *f_pos)
+static ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff_t *f_pos)
 {
 	struct pcdev_private_data *pcdev_data = (struct pcdev_private_data*)filp->private_data;
 
@@ -187,7 +187,7 @@ ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff
 
 
 
-int pcd_open(struct inode *inode, struct file *filp)
+static int pcd_open(struct inode *inode, struct file *filp)
 {
 
 	int ret;
@@ -215,7 +215,7 @@ int pcd_open(struct inode *inode, struct file *filp)
 	return ret;
 }
 
-int pcd_release(struct inode *inode, struct file *flip)
+static int pcd_release(struct inode *inode, struct file *flip)
 {
 	pr_info("release was successful\n");
 
@@ -237,7 +237,7 @@ struct file_operations pcd_fops=
 
 
 /*Called when the device is removed from the system */
-int pcd_platform_driver_remove(struct platform_device *pdev)
+static void pcd_platform_driver_remove(struct platform_device *pdev)
 {
 
 #if 1
@@ -254,10 +254,9 @@ int pcd_platform_driver_remove(struct platform_device *pdev)
 
 #endif 
 	dev_info(&pdev->dev,"A device is removed\n");
-	return 0;
 }
 
-struct pcdev_platform_data* pcdev_get_platdata_from_dt(struct device *dev)
+static struct pcdev_platform_data* pcdev_get_platdata_from_dt(struct device *dev)
 {
 	struct device_node *dev_node = dev->of_node;
 	struct pcdev_platform_data *pdata;
@@ -298,7 +297,7 @@ struct pcdev_platform_data* pcdev_get_platdata_from_dt(struct device *dev)
 struct of_device_id org_pcdev_dt_match[] ;
 
 /*Called when matched platform device is found */
-int pcd_platform_driver_probe(struct platform_device *pdev)
+static int pcd_platform_driver_probe(struct platform_device *pdev)
 {
 	int ret;
 
@@ -441,7 +440,7 @@ static int __init pcd_platform_driver_init(void)
 	}
 
 	/*2. Create device class under /sys/class */
-	pcdrv_data.class_pcd = class_create(THIS_MODULE,"pcd_class");
+	pcdrv_data.class_pcd = class_create("pcd_class");
 	if(IS_ERR(pcdrv_data.class_pcd)){
 		pr_err("Class creation failed\n");
 		ret = PTR_ERR(pcdrv_data.class_pcd);

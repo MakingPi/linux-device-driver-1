@@ -178,4 +178,71 @@ dmesg
 rmmod pcd_device_setup
 rmmod pcd_platform_driver
 
+# Since this is assuming Kernel 6.x development, I did not do any of the swiching of kernel 4.x to 5.x stuff
+# and will stick with the same working copy of the kernel.
+# Section 7 & 8
+# on the host, from 005_pcd_platform_driver_dt/ folder
+make host
+make
+file pcd_platform_driver_dt.ko
+# dts folder structure in kernel 6.x is different
+cd ../../sources/linux_bbb/arch/arm/boot/dts/ti/omap/
+touch am335x-boneblack-lddcourse.dtsi
+nano am335x-boneblack-lddcourse.dtsi
+# contents of dtsi file
+# / {
+#     pcdev-1 {
+#         compatible = "pcdev-E1x","pcdev-A1x";
+#         org,size = <512>;
+#         org,device-serial-num = "PCDEV1ABC123";
+#         org,perm = <0x11>;
+#     };
+#     pcdev-2 {
+#         compatible = "pcdev-B1x";
+#         org,size = <1024>;
+#         org,device-serial-num = "PCDEV2ABC123";
+#         org,perm = <0x11>;
+#     };
+#     pcdev-3 {
+#         compatible = "pcdev-C1x";
+#         org,size = <256>;
+#         org,device-serial-num = "PCDEV3ABC123";
+#         org,perm = <0x11>;
+#     };
+#     pcdev-4 {
+#         compatible = "pcdev-D1x";
+#         org,size = <2048>;
+#         org,device-serial-num = "PCDEV4ABC123";
+#         org,perm = <0x11>;
+#     };
+# };
 
+# get to linux root folder (linux_bbb)
+cd ../../../../../../
+arm-make ti/omap/am335x-boneblack.dtb
+
+# use updated Makefile to copy dtb and ko file to beaglebone
+make
+make copy-dtb
+make copy-drv
+
+# switch to target
+lsblk
+# in this kernel, the boot partition is already mounted as /boot/firmware !
+cd /boot/firmware
+# backup
+mv am335x-boneblack.dtb am335x-boneblack_6.12.dtb
+# apply new device tree
+cp /home/debian/drivers/am335x-boneblack.dtb .
+sudo reboot
+
+# view device tree info
+ls /sys/devices/platform
+cd /sys/devices/platform/pcdev-1
+ls
+cat of_node/name
+cat of_node/compatible
+
+# load driver to test matching
+sudo insmod drivers/pcd_platform_driver_dt.ko
+# observe the probe debug output

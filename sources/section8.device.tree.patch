@@ -1,0 +1,113 @@
+diff --git a/arch/arm/boot/dts/ti/omap/am335x-boneblack-lddcourse.dtsi b/arch/arm/boot/dts/ti/omap/am335x-boneblack-lddcourse.dtsi
+new file mode 100644
+index 000000000000..4dba4d15f482
+--- /dev/null
++++ b/arch/arm/boot/dts/ti/omap/am335x-boneblack-lddcourse.dtsi
+@@ -0,0 +1,27 @@
++
++/ {
++    pcdev-1 {
++        compatible = "pcdev-E1x","pcdev-A1x";
++        org,size = <512>;
++        org,device-serial-num = "PCDEV1ABC123";
++        org,perm = <0x11>;
++    };
++    pcdev-2 {
++        compatible = "pcdev-B1x";
++        org,size = <1024>;
++        org,device-serial-num = "PCDEV2ABC123";
++        org,perm = <0x11>;
++    };
++    pcdev-3 {
++        compatible = "pcdev-C1x";
++        org,size = <256>;
++        org,device-serial-num = "PCDEV3ABC123";
++        org,perm = <0x11>;
++    };
++    pcdev-4 {
++        compatible = "pcdev-D1x";
++        org,size = <2048>;
++        org,device-serial-num = "PCDEV4ABC123";
++        org,perm = <0x11>;
++    };
++};
+\ No newline at end of file
+diff --git a/arch/arm/boot/dts/ti/omap/am335x-boneblack.dts b/arch/arm/boot/dts/ti/omap/am335x-boneblack.dts
+index 09ea63942ff5..37b4608d3856 100644
+--- a/arch/arm/boot/dts/ti/omap/am335x-boneblack.dts
++++ b/arch/arm/boot/dts/ti/omap/am335x-boneblack.dts
+@@ -8,6 +8,7 @@
+ #include "am335x-bone-common.dtsi"
+ #include "am335x-boneblack-common.dtsi"
+ #include "am335x-boneblack-hdmi.dtsi"
++#include "am335x-boneblack-lddcourse.dtsi"
+ 
+ / {
+ 	model = "TI AM335x BeagleBone Black";
+diff --git a/drivers/char/001hello_world/Kconfig b/drivers/char/001hello_world/Kconfig
+new file mode 100644
+index 000000000000..3b7f95307f8e
+--- /dev/null
++++ b/drivers/char/001hello_world/Kconfig
+@@ -0,0 +1,5 @@
++menu "001 Hello World"
++    config CUSTOM_HELLOWORLD
++        tristate "001 hello world module support"
++        default m
++endmenu
+diff --git a/drivers/char/001hello_world/Makefile b/drivers/char/001hello_world/Makefile
+new file mode 100644
+index 000000000000..855ec3d7d53f
+--- /dev/null
++++ b/drivers/char/001hello_world/Makefile
+@@ -0,0 +1 @@
++obj-$(CONFIG_CUSTOM_HELLOWORLD) += main.o
+diff --git a/drivers/char/001hello_world/main.c b/drivers/char/001hello_world/main.c
+new file mode 100644
+index 000000000000..f59162f6a630
+--- /dev/null
++++ b/drivers/char/001hello_world/main.c
+@@ -0,0 +1,22 @@
++#include <linux/module.h>
++
++/*Module's init entry point */
++static int __init helloworld_init(void)
++{
++   pr_info("Hello world\n");
++   return 0;
++}
++
++/*Module's cleanup entry point */
++static void __exit helloworld_cleanup(void)
++{
++  pr_info("Good bye world\n");
++}
++
++module_init(helloworld_init);
++module_exit(helloworld_cleanup);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Pi Maker @ Github");
++MODULE_DESCRIPTION("A simple hello world kernel module");
++MODULE_INFO(board,"Beaglebone black REV C");
+diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+index 7c8dd0abcfdf..b94cc90c43a8 100644
+--- a/drivers/char/Kconfig
++++ b/drivers/char/Kconfig
+@@ -422,4 +422,6 @@ config ADI
+ 	  and SSM (Silicon Secured Memory).  Intended consumers of this
+ 	  driver include crash and makedumpfile.
+ 
++source "drivers/char/001hello_world/Kconfig"
++
+ endmenu
+diff --git a/drivers/char/Makefile b/drivers/char/Makefile
+index e9b360cdc99a..71136862e030 100644
+--- a/drivers/char/Makefile
++++ b/drivers/char/Makefile
+@@ -43,3 +43,5 @@ obj-$(CONFIG_PS3_FLASH)		+= ps3flash.o
+ obj-$(CONFIG_XILLYBUS_CLASS)	+= xillybus/
+ obj-$(CONFIG_POWERNV_OP_PANEL)	+= powernv-op-panel.o
+ obj-$(CONFIG_ADI)		+= adi.o
++
++obj-y                           += 001hello_world/
